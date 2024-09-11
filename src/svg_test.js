@@ -1,6 +1,7 @@
-import ImageTracer from "npm:imagetracerjs";
+import ImageTracer from "imagetracerjs";
 import { defaultOptions, PathData } from "./util.js";
-import { kMeans } from "./kmeans.js";
+import { MedianCut } from "@marmooo/color-reducer";
+import { createBorderedArray, createPalette } from "./compat.js";
 import { detectEdges } from "./edge.js";
 import { scanPaths } from "./scan.js";
 import { smoothPaths } from "./smooth.js";
@@ -76,8 +77,18 @@ Deno.test("check imagetracerjs data", async () => {
         image.width,
         image.height,
       );
-      const quantized1 = kMeans(imageData);
-      const quantized2 = structuredClone(quantized1);
+      const quantizer = new MedianCut(imageData, { cache: false });
+      quantizer.apply(16);
+      const indexedImage = quantizer.getIndexedImage();
+      const array1 = createBorderedArray(
+        indexedImage,
+        image.width,
+        image.height,
+      );
+      const array2 = structuredClone(array1);
+      const palette = createPalette(quantizer.replaceColors);
+      const quantized1 = { array: array1, palette };
+      const quantized2 = { array: array2, palette };
       const svg1 = toSVG1(quantized1, filterSegments);
       const svg2 = toSVG2(quantized2, filterSegments);
       const png1 = new Resvg(svg1).render().asPng();

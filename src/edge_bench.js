@@ -1,5 +1,6 @@
-import ImageTracer from "npm:imagetracerjs";
-import { kMeans } from "./kmeans.js";
+import ImageTracer from "imagetracerjs";
+import { MedianCut, OctreeQuantization } from "@marmooo/color-reducer";
+import { createBorderedArray, createPalette } from "./compat.js";
 import { detectEdges } from "./edge.js";
 import { getPixels } from "get_pixels";
 import { expandGlob } from "@std/fs";
@@ -13,8 +14,15 @@ Deno.bench("@marmooo/imagetracer", async () => {
       image.width,
       image.height,
     );
-    const quantized = kMeans(imageData);
-    const { array, palette } = quantized;
+    const quantizer = new OctreeQuantization(imageData, { cache: false });
+    quantizer.apply(16);
+    const indexedImage = quantizer.getIndexedImage();
+    const array = createBorderedArray(
+      indexedImage,
+      image.width,
+      image.height,
+    );
+    const palette = createPalette(quantizer.replaceColors);
     for (let k = 0; k < palette.length; k++) {
       detectEdges(array, k);
     }
@@ -29,8 +37,16 @@ Deno.bench("imagetracerjs", async () => {
       image.width,
       image.height,
     );
-    const quantized = kMeans(imageData);
-    const { palette } = quantized;
+    const quantizer = new MedianCut(imageData, { cache: false });
+    quantizer.apply(16);
+    const indexedImage = quantizer.getIndexedImage();
+    const array = createBorderedArray(
+      indexedImage,
+      image.width,
+      image.height,
+    );
+    const palette = createPalette(quantizer.replaceColors);
+    const quantized = { array, palette };
     for (let k = 0; k < palette.length; k++) {
       ImageTracer.layeringstep(quantized, k);
     }

@@ -1,4 +1,5 @@
-import { kMeans } from "./kmeans.js";
+import { MedianCut, OctreeQuantization } from "@marmooo/color-reducer";
+import { createBorderedArray, createPalette } from "./compat.js";
 import { detectEdges } from "./edge.js";
 import { scanPaths } from "./scan.js";
 import { smoothPaths } from "./smooth.js";
@@ -16,8 +17,15 @@ Deno.bench("current", async () => {
       image.width,
       image.height,
     );
-    const quantized = kMeans(imageData);
-    const { array, palette } = quantized;
+    const quantizer = new OctreeQuantization(imageData, { cache: false });
+    quantizer.apply(16);
+    const indexedImage = quantizer.getIndexedImage();
+    const array = createBorderedArray(
+      indexedImage,
+      image.width,
+      image.height,
+    );
+    const palette = createPalette(quantizer.replaceColors);
     for (let k = 0; k < palette.length; k++) {
       const edges = detectEdges(array, k);
       const paths = scanPaths(edges);
@@ -37,8 +45,15 @@ Deno.bench("old1", async () => {
       image.width,
       image.height,
     );
-    const quantized = kMeans(imageData);
-    const { array, palette } = quantized;
+    const quantizer = new OctreeQuantization(imageData, { cache: false });
+    quantizer.apply(16);
+    const indexedImage = quantizer.getIndexedImage();
+    const array = createBorderedArray(
+      indexedImage,
+      image.width,
+      image.height,
+    );
+    const palette = createPalette(quantizer.replaceColors);
     for (let k = 0; k < palette.length; k++) {
       const edges = detectEdges(array, k);
       const paths = scanPaths(edges);
@@ -58,8 +73,15 @@ Deno.bench("old2", async () => {
       image.width,
       image.height,
     );
-    const quantized = kMeans(imageData);
-    const { array, palette } = quantized;
+    const quantizer = new OctreeQuantization(imageData, { cache: false });
+    quantizer.apply(16);
+    const indexedImage = quantizer.getIndexedImage();
+    const array = createBorderedArray(
+      indexedImage,
+      image.width,
+      image.height,
+    );
+    const palette = createPalette(quantizer.replaceColors);
     for (let k = 0; k < palette.length; k++) {
       const edges = detectEdges(array, k);
       const paths = scanPaths(edges);
