@@ -39,34 +39,14 @@ export function scanPaths(arr, options = defaultOptions) {
   const paths = [];
   const width = arr[0].length;
   const height = arr.length;
-  let px, py;
-  let direction; // 0: right, 1: up, 2: left, 3: down
   for (let j = 0; j < height; j++) {
     for (let i = 0; i < width; i++) {
-      if (arr[j][i] === 4 || arr[j][i] === 11) { // Other values are not valid
-        px = i;
-        py = j;
-        direction = 1;
-        const isHole = arr[j][i] == 11;
-        const path = new Path(i, j, isHole);
-        paths.push(path);
-        while (true) {
-          const point = new Point(px - 1, py - 1);
-          path.points.push(point);
-          updateBoundingBox(path.boundingBox, px - 1, py - 1);
-          const lookup = lookupTables[arr[py][px]][direction];
-          arr[py][px] = lookup[0];
-          direction = lookup[1];
-          px += lookup[2];
-          py += lookup[3];
-          if (isClosePath(px, py, path.points[0])) {
-            if (path.points.length < filterPoints) {
-              paths.pop();
-            } else {
-              updateParent(paths, path);
-            }
-            break;
-          }
+      const type = arr[j][i];
+      if (type === 4 || type === 11) {
+        const path = scanPath(arr, i, j, filterPoints);
+        if (path) {
+          paths.push(path);
+          updateParent(paths, path);
         }
       }
     }
@@ -74,15 +54,39 @@ export function scanPaths(arr, options = defaultOptions) {
   return paths;
 }
 
-function updateBoundingBox(boundingBox, px, py) {
-  if (px < boundingBox[0]) boundingBox[0] = px;
-  if (px > boundingBox[2]) boundingBox[2] = px;
-  if (py < boundingBox[1]) boundingBox[1] = py;
-  if (py > boundingBox[3]) boundingBox[3] = py;
+function scanPath(arr, x, y, filterPoints) {
+  const isHole = arr[y][x] === 11;
+  const path = new Path(x, y, isHole);
+  let direction = 1; // 0: right, 1: up, 2: left, 3: down
+  while (true) {
+    const nx = x - 1;
+    const ny = y - 1;
+    const point = new Point(nx, ny);
+    path.points.push(point);
+    updateBoundingBox(path.boundingBox, nx, ny);
+    const lookup = lookupTables[arr[y][x]][direction];
+    arr[y][x] = lookup[0];
+    direction = lookup[1];
+    x += lookup[2];
+    y += lookup[3];
+    if (isClosePath(x, y, path.points[0])) {
+      if (path.points.length < filterPoints) {
+        return null;
+      }
+      return path;
+    }
+  }
 }
 
-function isClosePath(px, py, startPoint) {
-  return (px - 1 === startPoint.x) && (py - 1 === startPoint.y);
+function updateBoundingBox(boundingBox, x, y) {
+  if (x < boundingBox[0]) boundingBox[0] = x;
+  if (x > boundingBox[2]) boundingBox[2] = x;
+  if (y < boundingBox[1]) boundingBox[1] = y;
+  if (y > boundingBox[3]) boundingBox[3] = y;
+}
+
+function isClosePath(x, y, startPoint) {
+  return (x - 1 === startPoint.x) && (y - 1 === startPoint.y);
 }
 
 function containsBoundingBox(parentBBox, childBBox) {
