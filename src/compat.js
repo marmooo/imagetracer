@@ -8,7 +8,7 @@ export function createBorderedArray(indexedImage, width, height) {
   }
   for (let j = 0; j < height; j++) {
     for (let i = 0; i < width; i++) {
-      const index = j * width + i;
+      const index = j * height + i;
       layer[j + 1][i + 1] = indexedImage[index];
     }
   }

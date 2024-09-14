@@ -5,7 +5,7 @@
 export function detectEdges(indexedArray, colorIndex) {
   const width = indexedArray[0].length;
   const height = indexedArray.length;
-  const layer = createBorderedArray(width, height);
+  const layer = create2DArray(width, height);
   for (let j = 1; j < height; j++) {
     for (let i = 1; i < width; i++) {
       const jPrev = j - 1;
@@ -19,7 +19,7 @@ export function detectEdges(indexedArray, colorIndex) {
   return layer;
 }
 
-function createBorderedArray(width, height) {
+function create2DArray(width, height) {
   const layer = new Array(height);
   for (let j = 0; j < height; j++) {
     layer[j] = new Array(width);

@@ -1,61 +1,45 @@
 import { detectEdges } from "./edge.js";
-import { detectEdges16, detectEdgesByPalette } from "./edge_old.js";
+import {
+  createBorderedArray,
+  createBorderedInt8Array,
+  detectEdgesByBordered,
+  detectEdgesByBordered8,
+  detectEdgesByBorderedPalette,
+} from "./edge_old.js";
 
-// const arr = [
-//   [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
-//   [-1,1,1,1,1,0,0,0,1,-1],
-//   [-1,1,1,1,1,0,1,0,1,-1],
-//   [-1,1,1,1,1,0,0,1,1,-1],
-//   [-1,1,0,0,1,0,0,0,1,-1],
-//   [-1,1,1,1,1,0,0,0,1,-1],
-//   [-1,1,1,1,1,0,0,0,1,-1],
-//   [-1,1,0,0,1,0,1,0,1,-1],
-//   [-1,1,1,1,1,0,0,0,1,-1],
-//   [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
-// ];
+function createRandomIndexedImage(n) {
+  const indexedImage = new Uint8Array(n * n);
+  for (let i = 0; i < n * n; i++) {
+    indexedImage[i] = Math.round(Math.random());
+  }
+  return indexedImage;
+}
+
 const n = 100;
-const arr = new Array(n);
-for (let j = 0; j < n; j++) {
-  if (j === 0 || j == n - 1) {
-    arr[j] = new Array(n);
-    for (let i = 0; i < n; i++) {
-      arr[j][i] = -1;
-    }
-  } else {
-    arr[j] = new Array(n);
-    for (let i = 1; i < n - 1; i++) {
-      arr[j][i] = Math.round(Math.random());
-    }
-    arr[j][0] = -1;
-    arr[j][n - 1] = -1;
-  }
-}
-const arr16 = new Int16Array(n * n);
-for (let j = 0; j < n; j++) {
-  for (let i = 0; i < n; i++) {
-    const index = j * n + i;
-    // if (j === 0 || j === n - 1 || i === 0 || i === n - 1) {
-    //   arr16[index] = -1;
-    // } else {
-    //   arr16[index] = Math.round(Math.random());
-    // }
-    arr16[index] = arr[j][i];
-  }
-}
+const indexedImage = createRandomIndexedImage(n);
 const palette = [0, 1];
 
 Deno.bench("detectEdges", () => {
   const layers = new Array(palette.length);
   for (let k = 0; k < layers.length; k++) {
-    layers[k] = detectEdges(arr, k);
+    layers[k] = detectEdges(indexedImage, n, n, k);
   }
 });
-Deno.bench("detectEdges16", () => {
+Deno.bench("detectEdgesByBordered", () => {
+  const arr = createBorderedArray(indexedImage, n, n);
   const layers = new Array(palette.length);
   for (let k = 0; k < layers.length; k++) {
-    layers[k] = detectEdges16(arr16, n, n, k);
+    layers[k] = detectEdgesByBordered(arr, k);
   }
 });
-Deno.bench("detectEdgesByPalette", () => {
-  detectEdgesByPalette(arr, palette);
+Deno.bench("detectEdgesByBordered8", () => {
+  const arr8 = createBorderedInt8Array(indexedImage, n, n);
+  const layers = new Array(palette.length);
+  for (let k = 0; k < layers.length; k++) {
+    layers[k] = detectEdgesByBordered8(arr8, n + 2, n + 2, k);
+  }
+});
+Deno.bench("detectEdgesByBorderedPalette", () => {
+  const arr = createBorderedArray(indexedImage, n, n);
+  detectEdgesByBorderedPalette(arr, palette);
 });
