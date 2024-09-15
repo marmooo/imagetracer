@@ -10,16 +10,29 @@ export function detectEdges(
 ) {
   const layer = new Int8Array(width * height);
   for (let j = 1; j < height; j++) {
+    const y = j * width;
+    for (let i = 1; i < width; i++) {
+      const index = y + i;
+      if (indexedArray[index] === colorIndex) {
+        layer[index] = 1;
+        layer[index + 1] = 1;
+        layer[index + width] = 1;
+        layer[index + width + 1] = 1;
+      }
+    }
+  }
+  for (let k = width; k < layer.length; k++) {
+    if (layer[k] === 0) continue;
+    const i = k % width;
+    const j = Math.floor(k / width);
     const currRowIdx = j * width;
     const prevRowIdx = currRowIdx - width;
-    for (let i = 1; i < width; i++) {
-      const iPrev = i - 1;
-      layer[currRowIdx + i] =
-        (indexedArray[prevRowIdx + iPrev] === colorIndex ? 1 : 0) +
-        (indexedArray[prevRowIdx + i] === colorIndex ? 2 : 0) +
-        (indexedArray[currRowIdx + iPrev] === colorIndex ? 8 : 0) +
-        (indexedArray[currRowIdx + i] === colorIndex ? 4 : 0);
-    }
+    const iPrev = i - 1;
+    layer[currRowIdx + i] =
+      (indexedArray[prevRowIdx + iPrev] === colorIndex ? 1 : 0) +
+      (indexedArray[prevRowIdx + i] === colorIndex ? 2 : 0) +
+      (indexedArray[currRowIdx + iPrev] === colorIndex ? 8 : 0) +
+      (indexedArray[currRowIdx + i] === colorIndex ? 4 : 0);
   }
   return layer;
 }

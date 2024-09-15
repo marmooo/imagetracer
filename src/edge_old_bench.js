@@ -2,9 +2,10 @@ import {
   createBorderedArray,
   createBorderedInt16Array,
   detectEdgesFromBordered,
-  detectEdgesFromBordered8,
+  detectEdgesFromBordered16,
   detectEdgesFromBorderedPalette,
   detectEdgesFromIndexedImage,
+  detectEdgesWithFiltering,
 } from "./edge_old.js";
 
 function createRandomIndexedImage(width, height, numColors) {
@@ -38,11 +39,18 @@ Deno.bench("detectEdgesFromBordered", () => {
     layers[k] = detectEdgesFromBordered(arr, k);
   }
 });
-Deno.bench("detectEdgesFromBordered8", () => {
-  const arr8 = createBorderedInt16Array(indexedImage, width, height);
+Deno.bench("detectEdgesWithFiltering", () => {
+  const arr16 = createBorderedInt16Array(indexedImage, width, height);
   const layers = new Array(palette.length);
   for (let k = 0; k < layers.length; k++) {
-    layers[k] = detectEdgesFromBordered8(arr8, width + 2, height + 2, k);
+    layers[k] = detectEdgesWithFiltering(arr16, width + 2, height + 2, k);
+  }
+});
+Deno.bench("detectEdgesFromBordered16", () => {
+  const arr16 = createBorderedInt16Array(indexedImage, width, height);
+  const layers = new Array(palette.length);
+  for (let k = 0; k < layers.length; k++) {
+    layers[k] = detectEdgesFromBordered16(arr16, width + 2, height + 2, k);
   }
 });
 Deno.bench("detectEdgesFromBorderedPalette", () => {

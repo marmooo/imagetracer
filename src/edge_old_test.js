@@ -5,9 +5,10 @@ import {
   createBorderedArray,
   createBorderedInt16Array,
   detectEdgesFromBordered,
-  detectEdgesFromBordered8,
+  detectEdgesFromBordered16,
   detectEdgesFromBorderedPalette,
   detectEdgesFromIndexedImage,
+  detectEdgesWithFiltering,
 } from "./edge_old.js";
 import { getPixels } from "get_pixels";
 import { expandGlob } from "@std/fs";
@@ -82,12 +83,28 @@ for await (const file of expandGlob("test/imagetracerjs/*.png")) {
       }
     }
   });
+  Deno.test("detectEdgesWithFiltering", () => {
+    const width = image.width + 2;
+    const height = image.height + 2;
+    const layers2 = new Array(palette.length);
+    for (let k = 0; k < layers2.length; k++) {
+      layers2[k] = detectEdgesWithFiltering(arr16, width, height, k);
+    }
+    for (let k = 0; k < layers1.length; k++) {
+      for (let j = 0; j < height; j++) {
+        for (let i = 0; i < width; i++) {
+          const idx = j * width + i;
+          assertEquals(layers1[k][j][i], layers2[k][idx]);
+        }
+      }
+    }
+  });
   Deno.test("detectEdgesFromBordered16", () => {
     const width = image.width + 2;
     const height = image.height + 2;
     const layers2 = new Array(palette.length);
     for (let k = 0; k < layers2.length; k++) {
-      layers2[k] = detectEdgesFromBordered8(arr16, width, height, k);
+      layers2[k] = detectEdgesFromBordered16(arr16, width, height, k);
     }
     for (let k = 0; k < layers1.length; k++) {
       for (let j = 0; j < height; j++) {
