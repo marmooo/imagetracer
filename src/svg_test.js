@@ -1,8 +1,8 @@
 import ImageTracer from "imagetracerjs";
 import { defaultOptions, PathData } from "./util.js";
 import { MedianCut } from "@marmooo/color-reducer";
-import { createBorderedArray, createPalette } from "./compat.js";
-import { detectEdges } from "./edge.js";
+import { createBorderedInt16Array, detectEdges } from "./edge.js";
+import { createBorderedArray, createPalette } from "./edge_old.js";
 import { scanPaths } from "./scan.js";
 import { smoothPaths } from "./smooth.js";
 import { trace } from "./trace.js";
@@ -15,10 +15,13 @@ import { assertEquals } from "@std/assert";
 
 function toSVG1(quantized, filterSegments) {
   const { array, palette } = quantized;
+  let { width, height } = quantized;
+  width += 2;
+  height += 2;
   const layers = new Array(palette.length);
   for (let k = 0; k < palette.length; k++) {
-    const edges = detectEdges(array, k);
-    const paths = scanPaths(edges);
+    const edges = detectEdges(array, width, height, k);
+    const paths = scanPaths(edges, width, height);
     const smoothedPaths = smoothPaths(paths);
     const layer = new Array(smoothedPaths.length);
     for (let i = 0; i < smoothedPaths.length; i++) {
@@ -29,7 +32,7 @@ function toSVG1(quantized, filterSegments) {
     }
     layers[k] = layer;
   }
-  const traceData = new TraceData(array, palette, layers);
+  const traceData = new TraceData(width - 2, height - 2, palette, layers);
   const options = defaultOptions;
   options.precision = 0;
   options.filterSegments = filterSegments ? 3 : 0;
@@ -80,15 +83,17 @@ Deno.test("check imagetracerjs data", async () => {
       const quantizer = new MedianCut(imageData, { cache: false });
       quantizer.apply(16);
       const indexedImage = quantizer.getIndexedImage();
-      const array1 = createBorderedArray(
+      const array1 = createBorderedInt16Array(
         indexedImage,
         image.width,
         image.height,
       );
-      const array2 = structuredClone(array1);
+      const array2 = createBorderedArray(indexedImage, image.width, image.height);
       const palette = createPalette(quantizer.replaceColors);
-      const quantized1 = { array: array1, palette };
-      const quantized2 = { array: array2, palette };
+      const width = image.width;
+      const height = image.height;
+      const quantized1 = { array: array1, palette, width, height };
+      const quantized2 = { array: array2, palette, width, height };
       const svg1 = toSVG1(quantized1, filterSegments);
       const svg2 = toSVG2(quantized2, filterSegments);
       const png1 = new Resvg(svg1).render().asPng();

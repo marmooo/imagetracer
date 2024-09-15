@@ -34,16 +34,15 @@ const lookupTables = [
 ];
 
 // Walking through an edge node array, discarding edge node types 0 and 15 and creating paths from the rest.
-export function scanPaths(arr, options = defaultOptions) {
+export function scanPaths(arr, width, height, options = defaultOptions) {
   const { filterPoints } = options;
   const paths = [];
-  const width = arr[0].length;
-  const height = arr.length;
   for (let j = 0; j < height; j++) {
     for (let i = 0; i < width; i++) {
-      const type = arr[j][i];
+      const index = j * width + i;
+      const type = arr[index];
       if (type === 4 || type === 11) {
-        const path = scanPath(arr, i, j, filterPoints);
+        const path = scanPath(arr, i, j, width, filterPoints);
         if (path) {
           paths.push(path);
           updateParent(paths, path);
@@ -54,8 +53,9 @@ export function scanPaths(arr, options = defaultOptions) {
   return paths;
 }
 
-function scanPath(arr, x, y, filterPoints) {
-  const isHole = arr[y][x] === 11;
+function scanPath(arr, x, y, width, filterPoints) {
+  let index = y * width + x;
+  const isHole = arr[index] === 11;
   const path = new Path(x, y, isHole);
   let direction = 1; // 0: right, 1: up, 2: left, 3: down
   while (true) {
@@ -64,11 +64,12 @@ function scanPath(arr, x, y, filterPoints) {
     const point = new Point(nx, ny);
     path.points.push(point);
     updateBoundingBox(path.boundingBox, nx, ny);
-    const lookup = lookupTables[arr[y][x]][direction];
-    arr[y][x] = lookup[0];
+    const lookup = lookupTables[arr[index]][direction];
+    arr[index] = lookup[0];
     direction = lookup[1];
     x += lookup[2];
     y += lookup[3];
+    index = y * width + x;
     if (isClosePath(x, y, path.points[0])) {
       if (path.points.length < filterPoints) {
         return null;

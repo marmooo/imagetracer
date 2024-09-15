@@ -1,7 +1,7 @@
 import ImageTracer from "imagetracerjs";
 import { MedianCut, OctreeQuantization } from "@marmooo/color-reducer";
-import { createBorderedArray, createPalette } from "./compat.js";
-import { detectEdges } from "./edge.js";
+import { createBorderedInt16Array, detectEdges } from "./edge.js";
+import { createBorderedArray, createPalette } from "./edge_old.js";
 import { scanPaths } from "./scan.js";
 import { getPixels } from "get_pixels";
 import { expandGlob } from "@std/fs";
@@ -18,15 +18,17 @@ Deno.bench("@marmooo/imagetracer", async () => {
     const quantizer = new OctreeQuantization(imageData, { cache: false });
     quantizer.apply(16);
     const indexedImage = quantizer.getIndexedImage();
-    const array = createBorderedArray(
+    const array = createBorderedInt16Array(
       indexedImage,
       image.width,
       image.height,
     );
     const palette = createPalette(quantizer.replaceColors);
+    const width = image.width + 2;
+    const height = image.height + 2;
     for (let k = 0; k < palette.length; k++) {
-      const edges = detectEdges(array, k);
-      scanPaths(edges);
+      const edges = detectEdges(array, width, height, k);
+      scanPaths(edges, width, height);
     }
   }
 });

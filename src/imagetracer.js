@@ -6,10 +6,10 @@ import { trace } from "./trace.js";
 import { toSVGString } from "./svg.js";
 
 export class TraceData {
-  constructor(indexedArray, palette, layers) {
+  constructor(width, height, palette, layers) {
+    this.width = width;
+    this.height = height;
     this.palette = palette;
-    this.width = indexedArray[0].length - 2;
-    this.height = indexedArray.length - 2;
     this.layers = layers;
   }
 }

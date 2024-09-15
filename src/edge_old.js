@@ -2,7 +2,62 @@
 // 12  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓
 // 48  ░░  ░░  ░░  ░░  ░▓  ░▓  ░▓  ░▓  ▓░  ▓░  ▓░  ▓░  ▓▓  ▓▓  ▓▓  ▓▓
 //     0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
-export function detectEdgesByBordered(indexedArray, colorIndex) {
+export function detectEdgesFromIndexedImage(
+  indexedArray,
+  width,
+  height,
+  colorIndex,
+) {
+  const newWidth = width + 2;
+  const newHeight = height + 2;
+  const layer = new Int8Array(newWidth * newHeight);
+  const nextRight = width + 1;
+  const prevRight = width - 1;
+  for (let j = 0; j < height; j++) {
+    const currRowIdx = j * width;
+    const prevRowIdx = currRowIdx - width;
+    const newCurrRowIdx = (j + 1) * newWidth;
+    for (let i = 1; i < width; i++) {
+      const iPrev = i - 1;
+      layer[newCurrRowIdx + i + 1] =
+        (indexedArray[prevRowIdx + iPrev] === colorIndex ? 1 : 0) +
+        (indexedArray[prevRowIdx + i] === colorIndex ? 2 : 0) +
+        (indexedArray[currRowIdx + iPrev] === colorIndex ? 8 : 0) +
+        (indexedArray[currRowIdx + i] === colorIndex ? 4 : 0);
+    }
+    // left
+    layer[newCurrRowIdx + 1] =
+      (indexedArray[prevRowIdx] === colorIndex ? 2 : 0) +
+      (indexedArray[currRowIdx] === colorIndex ? 4 : 0);
+    // right
+    layer[newCurrRowIdx + nextRight] =
+      (indexedArray[prevRowIdx + prevRight] === colorIndex ? 1 : 0) +
+      (indexedArray[currRowIdx + prevRight] === colorIndex ? 8 : 0);
+  }
+  // bottom
+  const bottomPrevRowIdx = (height - 1) * width;
+  const bottomNewCurrRowIdx = (newHeight - 1) * newWidth;
+  for (let i = 1; i < width; i++) {
+    const iPrev = i - 1;
+    layer[bottomNewCurrRowIdx + i + 1] =
+      (indexedArray[bottomPrevRowIdx + iPrev] === colorIndex ? 1 : 0) +
+      (indexedArray[bottomPrevRowIdx + i] === colorIndex ? 2 : 0);
+  }
+  // bottom left
+  layer[bottomNewCurrRowIdx + 1] = indexedArray[bottomPrevRowIdx] === colorIndex
+    ? 2
+    : 0;
+  // bottom right
+  layer[bottomNewCurrRowIdx + nextRight] =
+    indexedArray[bottomPrevRowIdx + prevRight] === colorIndex ? 1 : 0;
+  return layer;
+}
+
+// Edge node types ( ▓: this layer or 1; ░: not this layer or 0 )
+// 12  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓
+// 48  ░░  ░░  ░░  ░░  ░▓  ░▓  ░▓  ░▓  ▓░  ▓░  ▓░  ▓░  ▓▓  ▓▓  ▓▓  ▓▓
+//     0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
+export function detectEdgesFromBordered(indexedArray, colorIndex) {
   const width = indexedArray[0].length;
   const height = indexedArray.length;
   const layer = create2DArray(width, height);
@@ -23,7 +78,7 @@ export function detectEdgesByBordered(indexedArray, colorIndex) {
 // 12  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓
 // 48  ░░  ░░  ░░  ░░  ░▓  ░▓  ░▓  ░▓  ▓░  ▓░  ▓░  ▓░  ▓▓  ▓▓  ▓▓  ▓▓
 //     0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
-export function detectEdgesByBordered8(
+export function detectEdgesFromBordered8(
   indexedArray,
   width,
   height,
@@ -45,7 +100,7 @@ export function detectEdgesByBordered8(
   return layer;
 }
 
-export function detectEdgesByBorderedPalette(indexedArray, palette) {
+export function detectEdgesFromBorderedPalette(indexedArray, palette) {
   const layers = new Array(palette.length);
   const width = indexedArray[0].length;
   const height = indexedArray.length;
@@ -113,8 +168,8 @@ export function createBorderedArray(uint8, width, height) {
   return bordered;
 }
 
-export function createBorderedInt8Array(uint8, width, height) {
-  const bordered = new Int8Array((width + 2) * (height + 2));
+export function createBorderedInt16Array(uint8, width, height) {
+  const bordered = new Int16Array((width + 2) * (height + 2));
   for (let j = 0; j < height; j++) {
     for (let i = 0; i < width; i++) {
       const indexFrom = j * width + i;
@@ -132,4 +187,14 @@ export function createBorderedInt8Array(uint8, width, height) {
     bordered[(width + 2) * (height + 1) + j] = -1;
   }
   return bordered;
+}
+
+export function createPalette(replaceColors) {
+  return replaceColors.map((rgb) => {
+    const b = (rgb >> 16) & 0xFF;
+    const g = (rgb >> 8) & 0xFF;
+    const r = rgb & 0xFF;
+    const a = 255;
+    return { r, g, b, a };
+  });
 }

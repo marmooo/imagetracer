@@ -1,7 +1,7 @@
 import ImageTracer from "imagetracerjs";
 import { MedianCut } from "@marmooo/color-reducer";
-import { createBorderedArray, createPalette } from "./compat.js";
-import { detectEdges } from "./edge.js";
+import { createBorderedInt16Array, detectEdges } from "./edge.js";
+import { createBorderedArray, createPalette } from "./edge_old.js";
 import { scanPaths } from "./scan.js";
 import { smoothPaths } from "./smooth.js";
 import { trace } from "./trace.js";
@@ -24,18 +24,20 @@ Deno.test("check imagetracerjs data", async () => {
     const quantizer = new MedianCut(imageData, { cache: false });
     quantizer.apply(16);
     const indexedImage = quantizer.getIndexedImage();
-    const array1 = createBorderedArray(
+    const array1 = createBorderedInt16Array(
       indexedImage,
       image.width,
       image.height,
     );
-    const array2 = structuredClone(array1);
+    const array2 = createBorderedArray(indexedImage, image.width, image.height);
     const palette = createPalette(quantizer.replaceColors);
     const quantized2 = { array: array2, palette };
+    const width = image.width + 2;
+    const height = image.height + 2;
     for (let k = 0; k < palette.length; k++) {
-      const edges1 = detectEdges(array1, k);
+      const edges1 = detectEdges(array1, width, height, k);
       const edges2 = ImageTracer.layeringstep(quantized2, k);
-      const paths1 = scanPaths(edges1);
+      const paths1 = scanPaths(edges1, width, height);
       const paths2 = ImageTracer.pathscan(edges2, pathomit);
       const smoothedPaths1 = smoothPaths(paths1);
       const smoothedPaths2 = ImageTracer.internodes(paths2, {
