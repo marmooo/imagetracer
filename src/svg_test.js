@@ -88,7 +88,11 @@ Deno.test("check imagetracerjs data", async () => {
         image.width,
         image.height,
       );
-      const array2 = createBorderedArray(indexedImage, image.width, image.height);
+      const array2 = createBorderedArray(
+        indexedImage,
+        image.width,
+        image.height,
+      );
       const palette = createPalette(quantizer.replaceColors);
       const width = image.width;
       const height = image.height;

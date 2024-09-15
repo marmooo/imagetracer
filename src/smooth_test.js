@@ -21,7 +21,11 @@ Deno.test("check imagetracerjs data", async () => {
     const quantizer = new MedianCut(imageData, { cache: false });
     quantizer.apply(16);
     const indexedImage = quantizer.getIndexedImage();
-    const array1 = createBorderedInt16Array(indexedImage, image.width, image.height);
+    const array1 = createBorderedInt16Array(
+      indexedImage,
+      image.width,
+      image.height,
+    );
     const array2 = createBorderedArray(indexedImage, image.width, image.height);
     const palette = createPalette(quantizer.replaceColors);
     const quantized2 = { array: array2, palette };
