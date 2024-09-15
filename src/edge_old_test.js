@@ -25,7 +25,7 @@ for await (const file of expandGlob("test/imagetracerjs/*.png")) {
   quantizer.apply(16);
   const indexedImage = quantizer.getIndexedImage();
   const arr = createBorderedArray(indexedImage, image.width, image.height);
-  const arr8 = createBorderedInt16Array(
+  const arr16 = createBorderedInt16Array(
     indexedImage,
     image.width,
     image.height,
@@ -38,11 +38,11 @@ for await (const file of expandGlob("test/imagetracerjs/*.png")) {
   }
 
   Deno.test("Array/Int8Array check", () => {
-    assertEquals(arr8.length, arr.length * arr[0].length);
+    assertEquals(arr16.length, arr.length * arr[0].length);
     for (let j = 0; j < arr.length; j++) {
       for (let i = 0; i < arr[0].length; i++) {
         const idx = j * arr[0].length + i;
-        assertEquals(arr[j][i], arr8[idx]);
+        assertEquals(arr[j][i], arr16[idx]);
       }
     }
   });
@@ -87,7 +87,7 @@ for await (const file of expandGlob("test/imagetracerjs/*.png")) {
     const height = image.height + 2;
     const layers2 = new Array(palette.length);
     for (let k = 0; k < layers2.length; k++) {
-      layers2[k] = detectEdgesFromBordered8(arr8, width, height, k);
+      layers2[k] = detectEdgesFromBordered8(arr16, width, height, k);
     }
     for (let k = 0; k < layers1.length; k++) {
       for (let j = 0; j < height; j++) {
