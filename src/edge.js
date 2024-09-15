@@ -27,10 +27,10 @@ export function detectEdges(
 export function createBorderedInt16Array(uint8, width, height) {
   const bordered = new Int16Array((width + 2) * (height + 2));
   for (let j = 0; j < height; j++) {
+    const indexFrom = j * width;
+    const indexTo = (j + 1) * (width + 2) ;
     for (let i = 0; i < width; i++) {
-      const indexFrom = j * width + i;
-      const indexTo = (j + 1) * (width + 2) + i + 1;
-      bordered[indexTo] = uint8[indexFrom];
+      bordered[indexTo + i + 1] = uint8[indexFrom + i];
     }
   }
   for (let i = 0; i < height + 2; i++) {

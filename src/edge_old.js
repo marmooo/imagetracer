@@ -62,8 +62,8 @@ export function detectEdgesFromBordered(indexedArray, colorIndex) {
   const height = indexedArray.length;
   const layer = create2DArray(width, height);
   for (let j = 1; j < height; j++) {
+    const jPrev = j - 1;
     for (let i = 1; i < width; i++) {
-      const jPrev = j - 1;
       const iPrev = i - 1;
       layer[j][i] = (indexedArray[jPrev][iPrev] === colorIndex ? 1 : 0) +
         (indexedArray[jPrev][i] === colorIndex ? 2 : 0) +
@@ -152,9 +152,9 @@ export function createBorderedArray(uint8, width, height) {
     bordered[j] = new Array(width + 2);
   }
   for (let j = 0; j < height; j++) {
+    const y = j * width;
     for (let i = 0; i < width; i++) {
-      const index = j * width + i;
-      bordered[j + 1][i + 1] = uint8[index];
+      bordered[j + 1][i + 1] = uint8[y + i];
     }
   }
   for (let j = 0; j < height + 2; j++) {
@@ -171,10 +171,10 @@ export function createBorderedArray(uint8, width, height) {
 export function createBorderedInt16Array(uint8, width, height) {
   const bordered = new Int16Array((width + 2) * (height + 2));
   for (let j = 0; j < height; j++) {
+    const yFrom = j * width;
+    const yTo = (j + 1) * (width + 2);
     for (let i = 0; i < width; i++) {
-      const indexFrom = j * width + i;
-      const indexTo = (j + 1) * (width + 2) + i + 1;
-      bordered[indexTo] = uint8[indexFrom];
+      bordered[yTo + i + 1] = uint8[yFrom + i];
     }
   }
   for (let i = 0; i < height + 2; i++) {
