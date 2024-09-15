@@ -38,8 +38,9 @@ export function scanPaths(arr, width, height, options = defaultOptions) {
   const { filterPoints } = options;
   const paths = [];
   for (let j = 0; j < height; j++) {
+    const y = j * width;
     for (let i = 0; i < width; i++) {
-      const index = j * width + i;
+      const index = y + i;
       const type = arr[index];
       if (type === 4 || type === 11) {
         const path = scanPath(arr, i, j, width, filterPoints);
