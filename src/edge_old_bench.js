@@ -3,6 +3,7 @@ import {
   createBorderedInt16Array,
   detectEdgesFromBordered,
   detectEdgesFromBordered16,
+  detectEdgesFromBordered16Palette,
   detectEdgesFromBorderedPalette,
   detectEdgesFromIndexedImage,
   detectEdgesWithFiltering,
@@ -56,4 +57,8 @@ Deno.bench("detectEdgesFromBordered16", () => {
 Deno.bench("detectEdgesFromBorderedPalette", () => {
   const arr = createBorderedArray(indexedImage, width, height);
   detectEdgesFromBorderedPalette(arr, palette);
+});
+Deno.bench("detectEdgesFromBordered16Palette", () => {
+  const arr16 = createBorderedInt16Array(indexedImage, width, height);
+  detectEdgesFromBordered16Palette(arr16, width + 2, height + 2, palette);
 });

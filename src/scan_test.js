@@ -34,11 +34,11 @@ Deno.test("check imagetracerjs data", async () => {
       const quantized2 = { array: array2, palette };
       const width = image.width + 2;
       const height = image.height + 2;
+      const layers1 = detectEdges(array1, width, height, palette);
+      const layers2 = ImageTracer.layering(quantized2);
       for (let k = 0; k < palette.length; k++) {
-        const edges1 = detectEdges(array1, width, height, k);
-        const edges2 = ImageTracer.layeringstep(quantized2, k);
-        const paths1 = scanPaths(edges1, width, height, { filterPoints });
-        const paths2 = ImageTracer.pathscan(edges2, filterPoints);
+        const paths1 = scanPaths(layers1[k], width, height, { filterPoints });
+        const paths2 = ImageTracer.pathscan(layers2[k], filterPoints);
         assertEquals(paths1.length, paths2.length);
         for (let i = 0; i < paths2.length; i++) {
           const path1 = paths1[i];

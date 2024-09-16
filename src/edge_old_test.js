@@ -6,6 +6,7 @@ import {
   createBorderedInt16Array,
   detectEdgesFromBordered,
   detectEdgesFromBordered16,
+  detectEdgesFromBordered16Palette,
   detectEdgesFromBorderedPalette,
   detectEdgesFromIndexedImage,
   detectEdgesWithFiltering,
@@ -123,6 +124,24 @@ for await (const file of expandGlob("test/imagetracerjs/*.png")) {
       for (let j = 0; j < height; j++) {
         for (let i = 0; i < width; i++) {
           assertEquals(layers1[k][j][i], layers2[k][j][i]);
+        }
+      }
+    }
+  });
+  Deno.test("detectEdgesFromBordered16Palette", () => {
+    const width = image.width + 2;
+    const height = image.height + 2;
+    const layers2 = detectEdgesFromBordered16Palette(
+      arr16,
+      width,
+      height,
+      palette,
+    );
+    for (let k = 0; k < layers1.length; k++) {
+      for (let j = 0; j < height; j++) {
+        for (let i = 0; i < width; i++) {
+          const idx = j * width + i;
+          assertEquals(layers1[k][j][i], layers2[k][idx]);
         }
       }
     }

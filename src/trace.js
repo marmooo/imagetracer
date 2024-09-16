@@ -21,24 +21,19 @@ export function trace(points, options = defaultOptions) {
 }
 
 export function findSequenceEnd(points, startIndex) {
-  const numPoints = points.length;
   const direction1 = points[startIndex].direction;
   let direction2 = -1;
-  let sequenceEnd = startIndex + 1;
-  let direction = points[sequenceEnd].direction;
-  while (
-    (direction === direction1 || direction == direction2 ||
-      direction2 === -1) &&
-    sequenceEnd < numPoints - 1
-  ) {
-    if (direction !== direction1 && direction2 === -1) {
+  let i;
+  for (i = startIndex + 1; i < points.length; i++) {
+    const direction = points[i].direction;
+    if (direction === direction1) continue;
+    if (direction2 === -1) {
       direction2 = direction;
+    } else if (direction !== direction2) {
+      break;
     }
-    sequenceEnd++;
-    direction = points[sequenceEnd].direction;
   }
-  if (sequenceEnd >= numPoints - 1) sequenceEnd = 0;
-  return sequenceEnd;
+  return i >= points.length - 1 ? 0 : i;
 }
 
 export function fit(points, start, end, options = defaultOptions) {

@@ -18,10 +18,9 @@ function toSVG1(quantized, filterSegments) {
   let { width, height } = quantized;
   width += 2;
   height += 2;
-  const layers = new Array(palette.length);
-  for (let k = 0; k < palette.length; k++) {
-    const edges = detectEdges(array, width, height, k);
-    const paths = scanPaths(edges, width, height);
+  const layers = detectEdges(array, width, height, quantized.palette);
+  for (let k = 0; k < quantized.palette.length; k++) {
+    const paths = scanPaths(layers[k], width, height);
     const smoothedPaths = smoothPaths(paths);
     const layer = new Array(smoothedPaths.length);
     for (let i = 0; i < smoothedPaths.length; i++) {

@@ -24,12 +24,11 @@ Deno.bench("@marmooo/imagetracer", async () => {
       image.width,
       image.height,
     );
-    const palette = createPalette(quantizer.replaceColors);
     const width = image.width + 2;
     const height = image.height + 2;
-    for (let k = 0; k < palette.length; k++) {
-      const edges = detectEdges(array, width, height, k);
-      const paths = scanPaths(edges, width, height);
+    const layers = detectEdges(array, width, height, quantizer.replaceColors);
+    for (let k = 0; k < quantizer.replaceColors.length; k++) {
+      const paths = scanPaths(layers[k], width, height);
       smoothPaths(paths);
     }
   }
