@@ -29,7 +29,7 @@ const traceData = toTraceData(indexedImage, width, height, replaceColors, option
 
 ## Process overview
 
-See [process overview and ideas for improvement](process_overview.md).
+See [process overview and ideas for improvement](docs/process_overview.md).
 
 ## Features
 
