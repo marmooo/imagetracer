@@ -36,7 +36,7 @@ See [process overview and ideas for improvement](process_overview.md).
 - simplify API from original
   ([imagetracerjs](https://github.com/jankovicsandras/imagetracerjs))
 - support ESM & Deno
-- TODO: support multiple quantization algorithms (use
+- support multiple quantization algorithms (use
   [@marmooo/color-reducer](https://github.com/marmooo/color-reducer))
 - minify & optimize output SVG
 - add benchmarks & improve performance
