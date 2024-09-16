@@ -157,18 +157,18 @@ export function detectEdgesFromBorderedPalette(indexedArray, palette) {
       const iPrev = i - 1;
       const iNext = i + 1;
       const n1 = prevColumn[iPrev] === val ? 1 : 0;
-      const n2 = prevColumn[i] === val ? 1 : 0;
-      const n3 = prevColumn[iNext] === val ? 1 : 0;
-      const n4 = currColumn[iPrev] === val ? 1 : 0;
+      const n2 = prevColumn[i] === val ? 2 : 0;
+      const n3 = prevColumn[iNext] === val ? 2 : 0;
+      const n4 = currColumn[iPrev] === val ? 8 : 0;
       const n5 = currColumn[iNext] === val ? 1 : 0;
-      const n6 = nextColumn[iPrev] === val ? 1 : 0;
+      const n6 = nextColumn[iPrev] === val ? 8 : 0;
       const n7 = nextColumn[i] === val ? 1 : 0;
-      const n8 = nextColumn[iNext] === val ? 1 : 0;
+      const n8 = nextColumn[iNext] === val ? 4 : 0;
       const layer = layers[val];
-      layer[jNext][iNext] = 1 + n5 * 2 + n8 * 4 + n7 * 8;
-      if (!n4) layer[jNext][i] = 0 + 2 + n7 * 4 + n6 * 8;
-      if (!n2) layer[j][iNext] = 0 + n3 * 2 + n5 * 4 + 8;
-      if (!n1) layer[j][i] = 0 + n2 * 2 + 4 + n4 * 8;
+      layer[jNext][iNext] = 1 + n5 * 2 + n8 + n7 * 8;
+      if (n4 === 0) layer[jNext][i] = 2 + n7 * 4 + n6;
+      if (n2 === 0) layer[j][iNext] = n3 + n5 * 4 + 8;
+      if (n1 === 0) layer[j][i] = n2 + 4 + n4;
     }
   }
   return layers;
@@ -185,26 +185,26 @@ export function detectEdgesFromBordered16Palette(
     layers[k] = new Uint8Array(width * height);
   }
   for (let j = 1; j < height - 1; j++) {
-    const prevColumn = (j - 1) * width;
     const currColumn = j * width;
-    const nextColumn = (j + 1) * width;
+    const prevColumn = currColumn - width;
+    const nextColumn = currColumn + width;
     for (let i = 1; i < width - 1; i++) {
       const val = indexedArray[currColumn + i];
       const iPrev = i - 1;
       const iNext = i + 1;
       const n1 = indexedArray[prevColumn + iPrev] === val ? 1 : 0;
-      const n2 = indexedArray[prevColumn + i] === val ? 1 : 0;
-      const n3 = indexedArray[prevColumn + iNext] === val ? 1 : 0;
-      const n4 = indexedArray[currColumn + iPrev] === val ? 1 : 0;
+      const n2 = indexedArray[prevColumn + i] === val ? 2 : 0;
+      const n3 = indexedArray[prevColumn + iNext] === val ? 2 : 0;
+      const n4 = indexedArray[currColumn + iPrev] === val ? 8 : 0;
       const n5 = indexedArray[currColumn + iNext] === val ? 1 : 0;
-      const n6 = indexedArray[nextColumn + iPrev] === val ? 1 : 0;
+      const n6 = indexedArray[nextColumn + iPrev] === val ? 8 : 0;
       const n7 = indexedArray[nextColumn + i] === val ? 1 : 0;
-      const n8 = indexedArray[nextColumn + iNext] === val ? 1 : 0;
+      const n8 = indexedArray[nextColumn + iNext] === val ? 4 : 0;
       const layer = layers[val];
-      layer[nextColumn + iNext] = 1 + n5 * 2 + n8 * 4 + n7 * 8;
-      if (!n4) layer[nextColumn + i] = 0 + 2 + n7 * 4 + n6 * 8;
-      if (!n2) layer[currColumn + iNext] = 0 + n3 * 2 + n5 * 4 + 8;
-      if (!n1) layer[currColumn + i] = 0 + n2 * 2 + 4 + n4 * 8;
+      layer[nextColumn + iNext] = 1 + n5 * 2 + n8 + n7 * 8;
+      if (n4 === 0) layer[nextColumn + i] = 2 + n7 * 4 + n6;
+      if (n2 === 0) layer[currColumn + iNext] = n3 + n5 * 4 + 8;
+      if (n1 === 0) layer[currColumn + i] = n2 + 4 + n4;
     }
   }
   return layers;
