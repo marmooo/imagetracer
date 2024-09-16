@@ -11,7 +11,7 @@ below algorithms.
 - [Octree quantization](https://en.wikipedia.org/wiki/Octree)
 - Uniform quantization
 
-![alt original image (20x scale)](docs/img/s2.png)
+![alt original image (20x scale)](img/s2.png)
 
 ## 2. Layer separation and edge detection
 
@@ -22,15 +22,15 @@ squares algorithm.
 
 - [Marching squares](https://en.wikipedia.org/wiki/Marching_squares)
 
-![alt layer 0: black](docs/img/s3.png) ![alt layer 1: yellow](docs/img/s4.png)
-![alt edge node examples](docs/img/s7.png)
+![alt layer 0: black](img/s3.png) ![alt layer 1: yellow](img/s4.png)
+![alt edge node examples](img/s7.png)
 
 ## 3. Scan paths
 
 The **scanPaths** function finds chains of edge nodes, example: the cyan dots
 and lines.
 
-![alt an edge node path](docs/img/s8.png)
+![alt an edge node path](img/s8.png)
 
 ## 4. Interpolation
 
@@ -38,28 +38,27 @@ The **smoothPaths** function interpolates the coordinates of the edge node
 paths. Every line segment in the new path has one of the 8 directions (East,
 North East, N, NW, W, SW, S, SE).
 
-![alt interpolating](docs/img/s9.png)
-![alt interpolation result](docs/img/s10.png)
+![alt interpolating](img/s9.png) ![alt interpolation result](img/s10.png)
 
 ## 5. Tracing
 
 The **trace** function splits the interpolated paths into sequences with two
 directions.
 
-![alt a sequence](docs/img/s11.png)
+![alt a sequence](img/s11.png)
 
 The **fit** function tries to fit a straight line on the start- and endpoint of
 the sequence (black line). If the distance error between the calculated points
 (black line) and actual sequence points (blue dots) is greater than the
 treshold, the point with the greatest error is selected (red line).
 
-![alt fitting a straight line](docs/img/s12.png)
+![alt fitting a straight line](img/s12.png)
 
 The **fit** function tries to fit a quadratic spline through the error point.
 
-![alt fitting a quadratic spline](docs/img/s13.png)
-![alt fitting line segments](docs/img/s14.png)
-![alt result with control points](docs/img/s15.png)
+![alt fitting a quadratic spline](img/s13.png)
+![alt fitting line segments](img/s14.png)
+![alt result with control points](img/s15.png)
 
 If the **fit** function can not fit a straight line or a quadratic spline to the
 sequence with the given error tresholds, then it will split the sequence in two
@@ -70,8 +69,8 @@ and recursively call **fit** on each part.
 ## 6. SVG rendering
 
 The coordinates are rendered to
-[SVG Paths](https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths) in
-the **toSVGString** function.
+[SVG Paths](https://developer.mozilla.org/en-US/Web/SVG/Tutorial/Paths) in the
+**toSVGString** function.
 
 # Ideas for improvement
 
