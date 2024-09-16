@@ -14,11 +14,10 @@ export class DPoint {
 }
 
 export class PathData {
-  constructor(segments, isHole, holeChildren, boundingBox) {
+  constructor(segments, isHole, holeChildren) {
     this.segments = segments;
     this.isHole = isHole;
     this.holeChildren = holeChildren;
-    this.boundingBox = boundingBox;
   }
 }
 

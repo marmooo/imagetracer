@@ -7,7 +7,7 @@ import { scanPaths } from "./scan.js";
 import { smoothPaths } from "./smooth.js";
 import { trace } from "./trace.js";
 import { toSVGString } from "./svg.js";
-import { TraceData } from "./imagetracer.js";
+import { TraceData } from "./mod.js";
 import { Resvg } from "npm:@resvg/resvg-js";
 import { getPixels } from "get_pixels";
 import { expandGlob } from "@std/fs";
