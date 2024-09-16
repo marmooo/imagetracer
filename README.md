@@ -18,9 +18,13 @@ const imageData = new ImageData(
   image.width,
   image.height,
 );
-const quantized = OctreeQuantization(imageData);
-const svg = toSVG(quantized.array, quantized.palette, options);
-const traceData = toTraceData(quantized.array, quantized.palette, options);
+const { width, height } = imageData;
+const quantizer = OctreeQuantization(imageData);
+quantizer.apply(256);
+const { replaceColors } = quantizer;
+const indexedImage = quantizer.getIndexedImage();
+const svg = toSVG(indexedImage, width, height, replaceColors, options);
+const traceData = toTraceData(indexedImage, width, height, replaceColors, options);
 ```
 
 ## Process overview
