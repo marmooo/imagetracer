@@ -33,6 +33,5 @@ export const defaultOptions = {
   strokeWidth: 1,
   scale: 1,
   precision: 1,
-  omitLine: 3,
   filterSegments: 0,
 };
