@@ -64,9 +64,7 @@ function toData(pathData, layer, options) {
 
 // https://stackoverflow.com/questions/11832914
 function round(num, precision = 0) {
-  const p = Math.pow(10, precision);
-  const n = (num * p) * (1 + Number.EPSILON);
-  return Math.round(n) / p;
+  return +num.toFixed(precision);
 }
 
 function nonHoleData(segments, options = defaultOptions) {
@@ -120,13 +118,13 @@ function holeChildrenData(pathData, layer, options = defaultOptions) {
     for (let i = 0; i < holeChildren.length; i++) {
       const segments = layer[holeChildren[i]].segments;
       const lastPoint = getLastPoints(segments.at(-1));
-      const x = round(lastPoint[0], precision);
-      const y = round(lastPoint[1], precision);
+      const x = round(lastPoint[0]);
+      const y = round(lastPoint[1]);
       str += `M${x} ${y}`;
       for (let j = segments.length - 1; j >= 0; j--) {
         const { type, x1, y1, x2, y2, x3 } = segments[j];
         const numbers = x3 === undefined ? [x1, y1] : [x2, y2, x1, y1];
-        const n = numbers.map((x) => round(x, precision)).join(" ");
+        const n = numbers.map((x) => round(x)).join(" ");
         str += prevType == type ? " " + n : type + n;
         prevType = type;
       }

@@ -9,7 +9,7 @@ import { assertEquals } from "@std/assert";
 
 function toSVG1(indexedImage, width, height, palette, filterSegments) {
   const options = {
-    precision: 0,
+    precision: -1,
     filterSegments: filterSegments ? 3 : 0,
   };
   return toSVG(indexedImage, width, height, palette, options);
@@ -40,7 +40,7 @@ function toSVG2(quantized, filterSegments) {
     height: array.length - 2,
   };
   const options = ImageTracer.checkoptions();
-  options.roundcoords = 0; // TODO: patch for svgpathstring() bugs
+  options.roundcoords = -1; // TODO: patch for svgpathstring() bugs
   options.viewbox = true;
   options.linefilter = filterSegments;
   return ImageTracer.getsvgstring(traceData, options);
