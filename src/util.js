@@ -31,7 +31,6 @@ export const defaultOptions = {
   splineTolerance: 1,
   // svg
   strokeWidth: 1,
-  scale: 1,
   precision: 1,
   filterSegments: 0,
 };

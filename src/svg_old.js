@@ -1,9 +1,9 @@
 import { defaultOptions } from "./util.js";
 
 export function toSVGString(traceData, options = defaultOptions) {
-  const { scale, filterSegments } = options;
-  const width = traceData.width * scale;
-  const height = traceData.height * scale;
+  const { filterSegments } = options;
+  const width = traceData.width;
+  const height = traceData.height;
   const viewBox = `viewBox="0 0 ${width} ${height}"`;
   let svg = `<svg xmlns="http://www.w3.org/2000/svg" ${viewBox}>`;
   for (let i = 0; i < traceData.layers.length; i++) {
