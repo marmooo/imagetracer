@@ -57,7 +57,7 @@ function toPath(pathData, traceData, layerIndex, options) {
 
 function toData(pathData, layer, options) {
   let str = nonHoleData(pathData.segments, options);
-  str += "  ";
+  str += " ";
   str += holeChildrenData(pathData, layer, options);
   return str;
 }
