@@ -35,6 +35,7 @@ function toSVG1(quantized, options) {
   const newOptions = defaultOptions;
   newOptions.precision = options.precision;
   newOptions.filterSegments = options.filterSegments;
+  newOptions.strokeWidth = options.strokeWidth;
   return toSVGString(traceData, newOptions);
 }
 
@@ -66,13 +67,16 @@ function toSVG2(quantized, options) {
   newOptions.viewbox = true;
   newOptions.roundcoords = options.precision;
   newOptions.linefilter = options.filterSegments;
+  newOptions.strokewidth = options.strokeWidth;
   return ImageTracer.getsvgstring(traceData, newOptions);
 }
 
 function* getOptions() {
   for (const precision of [-1, 3]) {
     for (const filterSegments of [3, 0]) {
-      yield { precision, filterSegments };
+      for (const strokeWidth of [1, 2]) {
+        yield { precision, filterSegments, strokeWidth };
+      }
     }
   }
 }
