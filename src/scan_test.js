@@ -9,33 +9,33 @@ import { assertEquals } from "@std/assert";
 
 Deno.test("check imagetracerjs data", async () => {
   for await (const file of expandGlob("test/imagetracerjs/*.png")) {
+    const blob = await Deno.readFile(file.path);
+    const image = await getPixels(blob);
+    const imageData = new ImageData(
+      new Uint8ClampedArray(image.data),
+      image.width,
+      image.height,
+    );
+    const quantizer = new MedianCut(imageData, { cache: false });
+    quantizer.apply(16);
+    const indexedImage = quantizer.getIndexedImage();
+    const array1 = createBorderedInt16Array(
+      indexedImage,
+      image.width,
+      image.height,
+    );
+    const array2 = createBorderedArray(
+      indexedImage,
+      image.width,
+      image.height,
+    );
+    const palette = createPalette(quantizer.replaceColors);
+    const quantized2 = { array: array2, palette };
+    const width = image.width + 2;
+    const height = image.height + 2;
+    const layers1 = detectEdges(array1, width, height, palette);
+    const layers2 = ImageTracer.layering(quantized2);
     for (const filterPoints of [0, 8]) {
-      const blob = await Deno.readFile(file.path);
-      const image = await getPixels(blob);
-      const imageData = new ImageData(
-        new Uint8ClampedArray(image.data),
-        image.width,
-        image.height,
-      );
-      const quantizer = new MedianCut(imageData, { cache: false });
-      quantizer.apply(16);
-      const indexedImage = quantizer.getIndexedImage();
-      const array1 = createBorderedInt16Array(
-        indexedImage,
-        image.width,
-        image.height,
-      );
-      const array2 = createBorderedArray(
-        indexedImage,
-        image.width,
-        image.height,
-      );
-      const palette = createPalette(quantizer.replaceColors);
-      const quantized2 = { array: array2, palette };
-      const width = image.width + 2;
-      const height = image.height + 2;
-      const layers1 = detectEdges(array1, width, height, palette);
-      const layers2 = ImageTracer.layering(quantized2);
       for (let k = 0; k < palette.length; k++) {
         const paths1 = scanPaths(layers1[k], width, height, { filterPoints });
         const paths2 = ImageTracer.pathscan(layers2[k], filterPoints);
