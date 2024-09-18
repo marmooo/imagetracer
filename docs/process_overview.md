@@ -4,8 +4,8 @@
 
 @marmooo/imagetracer requires
 [indexed image](https://en.wikipedia.org/wiki/Indexed_color). It can be created
-by using [color-reducer](https://github.com/marmooo/color-reducer) supported
-below algorithms.
+by using [@marmooo/color-reducer](https://github.com/marmooo/color-reducer)
+supported below algorithms.
 
 - [Median cut](https://en.wikipedia.org/wiki/Median_cut)
 - [Octree quantization](https://en.wikipedia.org/wiki/Octree)
