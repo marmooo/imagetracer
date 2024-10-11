@@ -2,17 +2,18 @@ import { defaultOptions } from "./util.js";
 
 export function toSVGString(traceData, options = defaultOptions) {
   const { filterSegments } = options;
-  const width = traceData.width;
-  const height = traceData.height;
+  const { layers, palette, width, height } = traceData;
   const viewBox = `viewBox="0 0 ${width} ${height}"`;
   let svg = `<svg xmlns="http://www.w3.org/2000/svg" ${viewBox}>`;
   for (let i = 0; i < traceData.layers.length; i++) {
-    const layer = traceData.layers[i];
+    const layer = layers[i];
+    const colorAttributes = toColorAttributes(palette[i], options);
     for (let j = 0; j < layer.length; j++) {
       const pathData = layer[j];
       if (pathData.isHole) continue;
       if (pathData.segments.length < filterSegments) continue;
-      svg += toPath(pathData, traceData, i, options);
+      const d = toData(pathData, layer, options);
+      svg += `<path${colorAttributes} d="${d}"/>`;
     }
   }
   svg += "</svg>";
@@ -48,13 +49,6 @@ function toColorAttributes(color, options = defaultOptions) {
     ? ""
     : ` stroke="${colorString}" stroke-width="${strokeWidth}"`;
   return fillStrokeAttr + strokeWidthAttr + opacityAttr;
-}
-
-function toPath(pathData, traceData, layerIndex, options) {
-  const { palette } = traceData;
-  const colorAttributes = toColorAttributes(palette[layerIndex], options);
-  const d = toData(pathData, traceData.layers[layerIndex], options);
-  return `<path${colorAttributes} d="${d}"/>`;
 }
 
 function toData(pathData, layer, options) {
