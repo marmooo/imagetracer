@@ -41,3 +41,11 @@ See [process overview and ideas for improvement](docs/process_overview.md).
 - minify & optimize output SVG
 - add benchmarks & improve performance
 - add tests & fixed some bugs
+
+## Test
+
+```
+deno test --allow-read
+deno bench --allow-read
+deno run --allow-read src/svg_size.js
+```
