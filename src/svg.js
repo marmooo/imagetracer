@@ -19,8 +19,10 @@ export function toSVGString(traceData, options = defaultOptions) {
   return svg;
 }
 
-function toColorString(color) {
-  const { r, g, b } = color;
+function toColorString(rgb) {
+  const b = rgb >> 16 & 0xFF;
+  const g = rgb >> 8 & 0xFF;
+  const r = rgb & 0xFF;
   const R = r.toString(16).padStart(2, "0");
   const G = g.toString(16).padStart(2, "0");
   const B = b.toString(16).padStart(2, "0");

@@ -68,7 +68,13 @@ Deno.test("check imagetracerjs data", async () => {
       const width = image.width;
       const height = image.height;
       const quantized2 = { array: array2, palette, width, height };
-      const svg1 = toSVG1(indexedImage, width, height, palette, filterSegments);
+      const svg1 = toSVG1(
+        indexedImage,
+        width,
+        height,
+        quantizer.replaceColors,
+        filterSegments,
+      );
       const svg2 = toSVG2(quantized2, filterSegments);
       const png1 = new Resvg(svg1).render().asPng();
       const png2 = new Resvg(svg2).render().asPng();
