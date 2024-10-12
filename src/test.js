@@ -11,6 +11,7 @@ function toSVG1(indexedImage, width, height, palette, filterSegments) {
   const options = {
     precision: -1,
     filterSegments: filterSegments ? 3 : 0,
+    mergePaths: false, // TODO: fail tests
   };
   return toSVG(indexedImage, width, height, palette, options);
 }

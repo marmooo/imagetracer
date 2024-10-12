@@ -1,19 +1,34 @@
 import { defaultOptions } from "./util.js";
 
 export function toSVGString(traceData, options = defaultOptions) {
-  const { filterSegments } = options;
+  const { filterSegments, mergePaths } = options;
   const { layers, palette, width, height } = traceData;
   const viewBox = `viewBox="0 0 ${width} ${height}"`;
   let svg = `<svg xmlns="http://www.w3.org/2000/svg" ${viewBox}>`;
-  for (let i = 0; i < traceData.layers.length; i++) {
-    const layer = layers[i];
-    const colorAttributes = toColorAttributes(palette[i], options);
-    for (let j = 0; j < layer.length; j++) {
-      const pathData = layer[j];
-      if (pathData.isHole) continue;
-      if (pathData.segments.length < filterSegments) continue;
-      const d = toData(pathData, layer, options);
+  if (mergePaths) {
+    for (let i = 0; i < traceData.layers.length; i++) {
+      const layer = layers[i];
+      const colorAttributes = toColorAttributes(palette[i], options);
+      let d = "";
+      for (let j = 0; j < layer.length; j++) {
+        const pathData = layer[j];
+        if (pathData.isHole) continue;
+        if (pathData.segments.length < filterSegments) continue;
+        d += toData(pathData, layer, options);
+      }
       svg += `<path${colorAttributes} d="${d}"/>`;
+    }
+  } else {
+    for (let i = 0; i < traceData.layers.length; i++) {
+      const layer = layers[i];
+      const colorAttributes = toColorAttributes(palette[i], options);
+      for (let j = 0; j < layer.length; j++) {
+        const pathData = layer[j];
+        if (pathData.isHole) continue;
+        if (pathData.segments.length < filterSegments) continue;
+        const d = toData(pathData, layer, options);
+        svg += `<path${colorAttributes} d="${d}"/>`;
+      }
     }
   }
   svg += "</svg>";

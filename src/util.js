@@ -30,7 +30,8 @@ export const defaultOptions = {
   lineTolerance: 1,
   splineTolerance: 1,
   // svg
-  strokeWidth: 1,
-  precision: 1,
   filterSegments: 0,
+  mergePaths: true,
+  precision: 1,
+  strokeWidth: 1,
 };
