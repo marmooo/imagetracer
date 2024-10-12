@@ -66,7 +66,6 @@ function toColorAttributes(rgba, options = defaultOptions) {
 
 function toData(pathData, layer, options) {
   let str = nonHoleData(pathData.segments, options);
-  str += " ";
   str += holeChildrenData(pathData, layer, options);
   return str;
 }
