@@ -43,13 +43,10 @@ function toColorAttributes(rgba, options = defaultOptions) {
   } else {
     fillStrokeAttr = ` fill="${colorString}"`;
   }
-  const a = rgba >> 24 & 0xFF;
-  const opacity = a / 255;
-  const opacityAttr = (opacity === 1) ? "" : ` opacity="${opacity}"`;
   const strokeWidthAttr = (strokeWidth === 0)
     ? ""
     : ` stroke="${colorString}" stroke-width="${strokeWidth}"`;
-  return fillStrokeAttr + strokeWidthAttr + opacityAttr;
+  return fillStrokeAttr + strokeWidthAttr;
 }
 
 function toData(pathData, layer, options) {

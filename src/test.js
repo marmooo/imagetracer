@@ -57,9 +57,10 @@ Deno.test("check imagetracerjs data", async () => {
         image.height,
       );
       const quantizer = new MedianCut(imageData, { cache: false });
-      const quantized = quantizer.apply(16);
+      quantizer.apply(16);
+      const indexedImage = quantizer.getIndexedImage();
       const array2 = createBorderedArray(
-        quantized,
+        indexedImage,
         image.width,
         image.height,
       );
@@ -68,7 +69,7 @@ Deno.test("check imagetracerjs data", async () => {
       const height = image.height;
       const quantized2 = { array: array2, palette, width, height };
       const svg1 = toSVG1(
-        quantized,
+        indexedImage,
         width,
         height,
         quantizer.replaceColors,
