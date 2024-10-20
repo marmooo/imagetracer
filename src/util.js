@@ -14,23 +14,23 @@ export class DPoint {
 }
 
 export class PathData {
-  constructor(segments, isHole, holeChildren) {
+  constructor(segments, isHole, holeChildren, ignore) {
     this.segments = segments;
     this.isHole = isHole;
     this.holeChildren = holeChildren;
+    this.ignore = ignore;
   }
 }
 
 export const defaultOptions = {
   // scan
-  filterPoints: 8,
+  filterHoles: 0,
   // smooth
   enhanceCorners: true,
   // trace
   lineTolerance: 1,
   splineTolerance: 1,
   // svg
-  filterSegments: 0,
   mergePaths: true,
   precision: 1,
   strokeWidth: 1,

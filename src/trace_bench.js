@@ -38,7 +38,7 @@ Deno.bench("@marmooo/imagetracer", async () => {
   }
 });
 Deno.bench("imagetracerjs", async () => {
-  const pathomit = 8;
+  const pathomit = 0;
   const ltres = 1;
   const qtres = 1;
   for await (const file of expandGlob("test/normal/*.jpg")) {

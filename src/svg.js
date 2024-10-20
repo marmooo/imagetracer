@@ -1,7 +1,7 @@
 import { defaultOptions } from "./util.js";
 
 export function toSVGString(traceData, options = defaultOptions) {
-  const { filterSegments, mergePaths } = options;
+  const { mergePaths } = options;
   const { layers, palette, width, height } = traceData;
   const viewBox = `viewBox="0 0 ${width} ${height}"`;
   let svg = `<svg xmlns="http://www.w3.org/2000/svg" ${viewBox}>`;
@@ -13,7 +13,6 @@ export function toSVGString(traceData, options = defaultOptions) {
       for (let j = 0; j < layer.length; j++) {
         const pathData = layer[j];
         if (pathData.isHole) continue;
-        if (pathData.segments.length < filterSegments) continue;
         d += toData(pathData, layer, options);
       }
       svg += `<path${colorAttributes} d="${d}"/>`;
@@ -25,7 +24,6 @@ export function toSVGString(traceData, options = defaultOptions) {
       for (let j = 0; j < layer.length; j++) {
         const pathData = layer[j];
         if (pathData.isHole) continue;
-        if (pathData.segments.length < filterSegments) continue;
         const d = toData(pathData, layer, options);
         svg += `<path${colorAttributes} d="${d}"/>`;
       }
@@ -65,7 +63,7 @@ function toColorAttributes(rgba, options = defaultOptions) {
 }
 
 function toData(pathData, layer, options) {
-  let str = nonHoleData(pathData.segments, options);
+  let str = nonHoleData(pathData, options);
   str += holeChildrenData(pathData, layer, options);
   return str;
 }
@@ -77,10 +75,12 @@ function round(num, precision = 0) {
   return Math.round(n) / p;
 }
 
-function nonHoleData(segments, options = defaultOptions) {
+function nonHoleData(pathData, options = defaultOptions) {
+  if (pathData.ignore) return "";
+  const { segments } = pathData;
   const { precision } = options;
   let prevType = "M";
-  let str;
+  let str = "";
   if (precision !== -1) {
     const x1 = round(segments[0].x1, precision);
     const y1 = round(segments[0].y1, precision);
@@ -119,14 +119,17 @@ function getLastPoints(segment) {
 }
 
 function holeChildrenData(pathData, layer, options = defaultOptions) {
-  const { precision } = options;
   const { holeChildren } = pathData;
   if (holeChildren.length === 0) return "";
+  const { precision } = options;
   let prevType = "M";
   let str = "";
   if (precision !== -1) {
     for (let i = 0; i < holeChildren.length; i++) {
-      const segments = layer[holeChildren[i]].segments;
+      // const segments = layer[holeChildren[i]].segments;
+      const pathData = layer[holeChildren[i]];
+      if (pathData.ignore) continue;
+      const segments = pathData.segments;
       const lastPoint = getLastPoints(segments.at(-1));
       const x = round(lastPoint[0], precision);
       const y = round(lastPoint[1], precision);
@@ -143,7 +146,10 @@ function holeChildrenData(pathData, layer, options = defaultOptions) {
     }
   } else {
     for (let i = 0; i < holeChildren.length; i++) {
-      const segments = layer[holeChildren[i]].segments;
+      // const segments = layer[holeChildren[i]].segments;
+      const pathData = layer[holeChildren[i]];
+      if (pathData.ignore) continue;
+      const segments = pathData.segments;
       const lastPoint = getLastPoints(segments.at(-1));
       str += `M${lastPoint[0]} ${lastPoint[1]}`;
       for (let j = segments.length - 1; j >= 0; j--) {

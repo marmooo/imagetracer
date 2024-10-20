@@ -41,7 +41,7 @@ function toSVG1(quantized, options) {
 
 function toSVG2(quantized, options) {
   const { array, palette } = quantized;
-  const pathomit = 8;
+  const pathomit = 0;
   const ltres = 1;
   const qtres = 1;
   const layers = new Array(palette.length);

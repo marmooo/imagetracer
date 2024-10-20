@@ -34,6 +34,7 @@ Deno.bench("@marmooo/imagetracer", async () => {
   }
 });
 Deno.bench("imagetracerjs", async () => {
+  const pathomit = 0;
   for await (const file of expandGlob("test/normal/*.jpg")) {
     const blob = await Deno.readFile(file.path);
     const image = await getPixels(blob);
@@ -54,7 +55,7 @@ Deno.bench("imagetracerjs", async () => {
     const quantized = { array, palette };
     for (let k = 0; k < palette.length; k++) {
       const edges = ImageTracer.layeringstep(quantized, k);
-      const paths = ImageTracer.pathscan(edges);
+      const paths = ImageTracer.pathscan(edges, pathomit);
       ImageTracer.internodes(paths, { rightangleenhance: true });
     }
   }

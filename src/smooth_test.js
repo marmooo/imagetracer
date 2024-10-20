@@ -9,7 +9,7 @@ import { expandGlob } from "@std/fs";
 import { assertEquals } from "@std/assert";
 
 Deno.test("check imagetracerjs data", async () => {
-  const pathomit = 8;
+  const pathomit = 0;
   for await (const file of expandGlob("test/imagetracerjs/*.png")) {
     const blob = await Deno.readFile(file.path);
     const image = await getPixels(blob);

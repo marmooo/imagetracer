@@ -31,6 +31,7 @@ function toSVG1(quantized, options) {
   }
   const traceData = new TraceData(width - 2, height - 2, palette, layers);
   const newOptions = defaultOptions;
+  newOptions.filterPoints = options.filterPoints;
   newOptions.precision = options.precision;
   newOptions.filterSegments = options.filterSegments;
   return toSVGString(traceData, newOptions);
@@ -62,16 +63,17 @@ function toSVG2(quantized, options) {
   };
   const newOptions = ImageTracer.checkoptions();
   newOptions.viewbox = true;
+  newOptions.omitPath = options.filterPoints;
   newOptions.roundcoords = options.precision;
   newOptions.linefilter = options.filterSegments;
   return ImageTracer.getsvgstring(traceData, newOptions);
 }
 
 function* getOptions() {
-  for (const removeHoles of [true, false]) {
+  for (const filterPoints of [0, 8]) {
     for (const precision of [-1, 3]) {
       for (const filterSegments of [3, 0]) {
-        yield { removeHoles, precision, filterSegments };
+        yield { filterPoints, precision, filterSegments };
       }
     }
   }

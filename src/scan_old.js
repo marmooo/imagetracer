@@ -1,9 +1,8 @@
-import { Point } from "./util.js";
+import { defaultOptions, Point } from "./util.js";
 
 class Path {
   points = [];
   holeChildren = [];
-  ignore = false;
 
   constructor(px, py, isHole) {
     this.boundingBox = [px, py, px, py];
@@ -35,7 +34,8 @@ const lookupTables = [
 ];
 
 // Walking through an edge node array, discarding edge node types 0 and 15 and creating paths from the rest.
-export function scanPaths(arr, width, height) {
+export function scanPaths(arr, width, height, options = defaultOptions) {
+  const { filterPoints } = options;
   const paths = [];
   for (let j = 0; j < height; j++) {
     const y = j * width;
@@ -43,7 +43,7 @@ export function scanPaths(arr, width, height) {
       const index = y + i;
       const type = arr[index];
       if (type === 4 || type === 11) {
-        const path = scanPath(arr, i, j, width);
+        const path = scanPath(arr, i, j, width, filterPoints);
         if (path) {
           paths.push(path);
           updateParent(paths, path);
@@ -54,7 +54,7 @@ export function scanPaths(arr, width, height) {
   return paths;
 }
 
-function scanPath(arr, x, y, width) {
+function scanPath(arr, x, y, width, filterPoints) {
   let index = y * width + x;
   const isHole = arr[index] === 11;
   const path = new Path(x, y, isHole);
@@ -72,6 +72,9 @@ function scanPath(arr, x, y, width) {
     y += lookup[3];
     index = y * width + x;
     if (isClosePath(x, y, path.points[0])) {
+      if (path.points.length < filterPoints) {
+        return null;
+      }
       return path;
     }
   }
@@ -88,7 +91,7 @@ function isClosePath(x, y, startPoint) {
   return (x - 1 === startPoint.x) && (y - 1 === startPoint.y);
 }
 
-export function containsBoundingBox(parentBBox, childBBox) {
+function containsBoundingBox(parentBBox, childBBox) {
   if (parentBBox[0] > childBBox[0]) return false;
   if (parentBBox[1] > childBBox[1]) return false;
   if (parentBBox[2] < childBBox[2]) return false;
