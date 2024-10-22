@@ -45,7 +45,7 @@ function createMask(path, width, height, left, top) {
       } else {
         setBit(curr.x, prev.y - 1);
       }
-    } else if (prev.y === curr.y) {
+    } else {
       if (prev.x < curr.x) {
         setBit(curr.x - 1, curr.y);
       } else {
