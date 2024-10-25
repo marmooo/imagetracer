@@ -87,5 +87,4 @@ The coordinates are rendered to
   [G-code](https://en.wikipedia.org/wiki/G-code) or other output?
 - comparing and integrating ideas from
   [Potrace](https://en.wikipedia.org/wiki/Potrace)
-- omitPath with background hole path shrinking
 - [Centerline tracing](https://github.com/jankovicsandras/imagetracerjs/issues/65)
