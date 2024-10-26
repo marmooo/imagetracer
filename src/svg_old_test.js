@@ -1,4 +1,5 @@
 import ImageTracer from "imagetracerjs";
+import sharp from "sharp";
 import { defaultOptions, PathData } from "./util.js";
 import { MedianCut } from "@marmooo/color-reducer";
 import { createBorderedInt16Array, detectEdges } from "./edge.js";
@@ -9,7 +10,6 @@ import { trace } from "./trace.js";
 import { toSVGString } from "./svg_old.js";
 import { TraceData } from "./mod.js";
 import { Resvg } from "npm:@resvg/resvg-js";
-import { getPixels } from "get_pixels";
 import { expandGlob } from "@std/fs";
 import { assertEquals } from "@std/assert";
 
@@ -84,29 +84,28 @@ function* getOptions() {
 Deno.test("check imagetracerjs data", async () => {
   for (const options of getOptions()) {
     for await (const file of expandGlob("test/imagetracerjs/*.png")) {
-      const blob = await Deno.readFile(file.path);
-      const image = await getPixels(blob);
-      const imageData = new ImageData(
-        new Uint8ClampedArray(image.data),
-        image.width,
-        image.height,
-      );
+      const { data, info } = await sharp(file.path)
+        .ensureAlpha()
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+      const uint8 = new Uint8ClampedArray(data);
+      const imageData = new ImageData(uint8, info.width, info.height);
       const quantizer = new MedianCut(imageData, { cache: false });
       quantizer.apply(16);
       const indexedImage = quantizer.getIndexedImage();
       const array1 = createBorderedInt16Array(
         indexedImage,
-        image.width,
-        image.height,
+        info.width,
+        info.height,
       );
       const array2 = createBorderedArray(
         indexedImage,
-        image.width,
-        image.height,
+        info.width,
+        info.height,
       );
       const palette = createPalette(quantizer.replaceColors);
-      const width = image.width;
-      const height = image.height;
+      const width = info.width;
+      const height = info.height;
       const quantized1 = { array: array1, palette, width, height };
       const quantized2 = { array: array2, palette, width, height };
       const svg1 = toSVG1(quantized1, options);

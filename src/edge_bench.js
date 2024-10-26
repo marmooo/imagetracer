@@ -1,45 +1,43 @@
 import ImageTracer from "imagetracerjs";
+import sharp from "sharp";
 import { MedianCut } from "@marmooo/color-reducer";
 import { createBorderedArray, createPalette } from "./edge_old.js";
 import { createBorderedInt16Array, detectEdges } from "./edge.js";
-import { getPixels } from "get_pixels";
 import { expandGlob } from "@std/fs";
 
 Deno.bench("@marmooo/imagetracer", async () => {
   for await (const file of expandGlob("test/normal/*.jpg")) {
-    const blob = await Deno.readFile(file.path);
-    const image = await getPixels(blob);
-    const imageData = new ImageData(
-      new Uint8ClampedArray(image.data),
-      image.width,
-      image.height,
-    );
+    const { data, info } = await sharp(file.path)
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    const uint8 = new Uint8ClampedArray(data);
+    const imageData = new ImageData(uint8, info.width, info.height);
     const quantizer = new MedianCut(imageData, { cache: false });
     quantizer.apply(16);
     const indexedImage = quantizer.getIndexedImage();
     const array = createBorderedInt16Array(
       indexedImage,
-      image.width,
-      image.height,
+      info.width,
+      info.height,
     );
-    const width = image.width + 2;
-    const height = image.height + 2;
+    const width = info.width + 2;
+    const height = info.height + 2;
     detectEdges(array, width, height, quantizer.replaceColors);
   }
 });
 Deno.bench("imagetracerjs (layeringstep)", async () => {
   for await (const file of expandGlob("test/normal/*.jpg")) {
-    const blob = await Deno.readFile(file.path);
-    const image = await getPixels(blob);
-    const imageData = new ImageData(
-      new Uint8ClampedArray(image.data),
-      image.width,
-      image.height,
-    );
+    const { data, info } = await sharp(file.path)
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    const uint8 = new Uint8ClampedArray(data);
+    const imageData = new ImageData(uint8, info.width, info.height);
     const quantizer = new MedianCut(imageData, { cache: false });
     quantizer.apply(16);
     const indexedImage = quantizer.getIndexedImage();
-    const array = createBorderedArray(indexedImage, image.width, image.height);
+    const array = createBorderedArray(indexedImage, info.width, info.height);
     const palette = createPalette(quantizer.replaceColors);
     const quantized = { array, palette };
     for (let k = 0; k < palette.length; k++) {
@@ -49,17 +47,16 @@ Deno.bench("imagetracerjs (layeringstep)", async () => {
 });
 Deno.bench("imagetracerjs (layering)", async () => {
   for await (const file of expandGlob("test/normal/*.jpg")) {
-    const blob = await Deno.readFile(file.path);
-    const image = await getPixels(blob);
-    const imageData = new ImageData(
-      new Uint8ClampedArray(image.data),
-      image.width,
-      image.height,
-    );
+    const { data, info } = await sharp(file.path)
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    const uint8 = new Uint8ClampedArray(data);
+    const imageData = new ImageData(uint8, info.width, info.height);
     const quantizer = new MedianCut(imageData, { cache: false });
     quantizer.apply(16);
     const indexedImage = quantizer.getIndexedImage();
-    const array = createBorderedArray(indexedImage, image.width, image.height);
+    const array = createBorderedArray(indexedImage, info.width, info.height);
     const palette = createPalette(quantizer.replaceColors);
     const quantized = { array, palette };
     ImageTracer.layering(quantized);

@@ -1,4 +1,5 @@
 import ImageTracer from "imagetracerjs";
+import sharp from "sharp";
 import { MedianCut } from "@marmooo/color-reducer";
 import { createPalette } from "./edge_old.js";
 import {
@@ -11,27 +12,21 @@ import {
   detectEdgesFromIndexedImage,
   detectEdgesWithFiltering,
 } from "./edge_old.js";
-import { getPixels } from "get_pixels";
 import { expandGlob } from "@std/fs";
 import { assertEquals } from "@std/assert";
 
 for await (const file of expandGlob("test/imagetracerjs/*.png")) {
-  const blob = await Deno.readFile(file.path);
-  const image = await getPixels(blob);
-  const imageData = new ImageData(
-    new Uint8ClampedArray(image.data),
-    image.width,
-    image.height,
-  );
+  const { data, info } = await sharp(file.path)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const uint8 = new Uint8ClampedArray(data);
+  const imageData = new ImageData(uint8, info.width, info.height);
   const quantizer = new MedianCut(imageData, { cache: false });
   quantizer.apply(16);
   const indexedImage = quantizer.getIndexedImage();
-  const arr = createBorderedArray(indexedImage, image.width, image.height);
-  const arr16 = createBorderedInt16Array(
-    indexedImage,
-    image.width,
-    image.height,
-  );
+  const arr = createBorderedArray(indexedImage, info.width, info.height);
+  const arr16 = createBorderedInt16Array(indexedImage, info.width, info.height);
   const palette = createPalette(quantizer.replaceColors);
   const quantized = { array: arr, palette };
   const layers1 = new Array(palette.length);
@@ -49,14 +44,14 @@ for await (const file of expandGlob("test/imagetracerjs/*.png")) {
     }
   });
   Deno.test("detectEdgesFromIndexedImage", () => {
-    const width = image.width + 2;
-    const height = image.height + 2;
+    const width = info.width + 2;
+    const height = info.height + 2;
     const layers2 = new Array(palette.length);
     for (let k = 0; k < layers2.length; k++) {
       layers2[k] = detectEdgesFromIndexedImage(
         indexedImage,
-        image.width,
-        image.height,
+        info.width,
+        info.height,
         k,
       );
     }
@@ -70,8 +65,8 @@ for await (const file of expandGlob("test/imagetracerjs/*.png")) {
     }
   });
   Deno.test("detectEdgesFromBordered", () => {
-    const width = image.width + 2;
-    const height = image.height + 2;
+    const width = info.width + 2;
+    const height = info.height + 2;
     const layers2 = new Array(palette.length);
     for (let k = 0; k < layers2.length; k++) {
       layers2[k] = detectEdgesFromBordered(arr, k);
@@ -85,8 +80,8 @@ for await (const file of expandGlob("test/imagetracerjs/*.png")) {
     }
   });
   Deno.test("detectEdgesWithFiltering", () => {
-    const width = image.width + 2;
-    const height = image.height + 2;
+    const width = info.width + 2;
+    const height = info.height + 2;
     const layers2 = new Array(palette.length);
     for (let k = 0; k < layers2.length; k++) {
       layers2[k] = detectEdgesWithFiltering(arr16, width, height, k);
@@ -101,8 +96,8 @@ for await (const file of expandGlob("test/imagetracerjs/*.png")) {
     }
   });
   Deno.test("detectEdgesFromBordered16", () => {
-    const width = image.width + 2;
-    const height = image.height + 2;
+    const width = info.width + 2;
+    const height = info.height + 2;
     const layers2 = new Array(palette.length);
     for (let k = 0; k < layers2.length; k++) {
       layers2[k] = detectEdgesFromBordered16(arr16, width, height, k);
@@ -117,8 +112,8 @@ for await (const file of expandGlob("test/imagetracerjs/*.png")) {
     }
   });
   Deno.test("detectEdgesFromBorderedPalette", () => {
-    const width = image.width + 2;
-    const height = image.height + 2;
+    const width = info.width + 2;
+    const height = info.height + 2;
     const layers2 = detectEdgesFromBorderedPalette(arr, palette);
     for (let k = 0; k < layers1.length; k++) {
       for (let j = 0; j < height; j++) {
@@ -129,8 +124,8 @@ for await (const file of expandGlob("test/imagetracerjs/*.png")) {
     }
   });
   Deno.test("detectEdgesFromBordered16Palette", () => {
-    const width = image.width + 2;
-    const height = image.height + 2;
+    const width = info.width + 2;
+    const height = info.height + 2;
     const layers2 = detectEdgesFromBordered16Palette(
       arr16,
       width,
