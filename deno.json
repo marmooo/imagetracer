@@ -6,6 +6,5 @@
     "@std/fs": "jsr:@std/fs@1.0.3",
     "imagetracerjs": "npm:imagetracerjs@1.2.6",
     "sharp": "npm:sharp@0.33.5"
-  },
-  "nodeModulesDir": "auto"
+  }
 }
