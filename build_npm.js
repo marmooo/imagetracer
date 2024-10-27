@@ -22,7 +22,7 @@ await build({
   },
   package: {
     name: "@marmooo/imagetracer",
-    version: "0.0.0",
+    version: "0.0.1",
     description:
       "Simple raster image tracer and vectorizer written in JavaScript.",
     license: "MIT",
