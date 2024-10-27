@@ -7,19 +7,10 @@ Simple raster image tracer and vectorizer written in JavaScript.
 ## Usage
 
 ```
-import sharp from "sharp";
 import { OctreeQuantization } from "npm:@marmooo/color-reducer";
 import { toSVG, toTraceData } from "npm:@marmooo/imagetracer";
 
-const { data, info } = await sharp(file.path)
-  .ensureAlpha()
-  .raw()
-  .toBuffer({ resolveWithObject: true });
-const imageData = new ImageData(
-  new Uint8ClampedArray(data),
-  info.width,
-  info.height,
-);
+const imageData = new ImageData(dataArray, 64, 64);
 const { width, height } = imageData;
 const quantizer = OctreeQuantization(imageData);
 quantizer.apply(256);
