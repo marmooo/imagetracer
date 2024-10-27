@@ -7,16 +7,18 @@ Simple raster image tracer and vectorizer written in JavaScript.
 ## Usage
 
 ```
-import { getPixels } from "https://deno.land/x/get_pixels/mod.ts";
+import sharp from "sharp";
 import { OctreeQuantization } from "npm:@marmooo/color-reducer";
 import { toSVG, toTraceData } from "npm:@marmooo/imagetracer";
 
-const file = await Deno.readFile("test.png");
-const image = await getPixels(file);
+const { data, info } = await sharp(file.path)
+  .ensureAlpha()
+  .raw()
+  .toBuffer({ resolveWithObject: true });
 const imageData = new ImageData(
-  new Uint8ClampedArray(image.data),
-  image.width,
-  image.height,
+  new Uint8ClampedArray(data),
+  info.width,
+  info.height,
 );
 const { width, height } = imageData;
 const quantizer = OctreeQuantization(imageData);
