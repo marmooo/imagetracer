@@ -3,7 +3,7 @@ import sharp from "sharp";
 import { MedianCut } from "@marmooo/color-reducer";
 import { toSVG } from "./mod.js";
 import { createBorderedArray, createPalette } from "./edge_old.js";
-import { Resvg } from "npm:@resvg/resvg-js";
+// import { Resvg } from "npm:@resvg/resvg-js";
 import { expandGlob } from "@std/fs";
 import { assertEquals } from "@std/assert";
 
@@ -72,8 +72,13 @@ Deno.test("check imagetracerjs data", async () => {
       quantizer.replaceColors,
     );
     const svg2 = toSVG2(quantized2);
-    const png1 = new Resvg(svg1).render().asPng();
-    const png2 = new Resvg(svg2).render().asPng();
+    // TODO: output is different between Deno and Node
+    // const png1 = new Resvg(svg1).render().asPng();
+    // const png2 = new Resvg(svg2).render().asPng();
+    const text1 = new TextEncoder().encode(svg1);
+    const text2 = new TextEncoder().encode(svg2);
+    const png1 = await sharp(text1).ensureAlpha().raw().toBuffer();
+    const png2 = await sharp(text2).ensureAlpha().raw().toBuffer();
     const blob1 = new Uint32Array(png1);
     const blob2 = new Uint32Array(png2);
     for (let i = 0; i < blob1.length; i++) {

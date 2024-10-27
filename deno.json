@@ -1,7 +1,6 @@
 {
   "imports": {
     "@marmooo/color-reducer": "npm:@marmooo/color-reducer@0.0.7",
-    "@resvg/resvg-js": "npm:@resvg/resvg-js@2.6.2",
     "@std/assert": "jsr:@std/assert@1.0.3",
     "@std/fs": "jsr:@std/fs@1.0.3",
     "imagetracerjs": "npm:imagetracerjs@1.2.6",
