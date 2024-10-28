@@ -21,8 +21,9 @@ for await (const file of expandGlob("test/imagetracerjs/*.png")) {
     .raw()
     .toBuffer({ resolveWithObject: true });
   const uint8 = new Uint8ClampedArray(data);
-  const imageData = new ImageData(uint8, info.width, info.height);
-  const quantizer = new MedianCut(imageData, { cache: false });
+  const quantizer = new MedianCut(uint8, info.width, info.height, {
+    cache: false,
+  });
   quantizer.apply(16);
   const indexedImage = quantizer.getIndexedImage();
   const arr = createBorderedArray(indexedImage, info.width, info.height);

@@ -14,8 +14,9 @@ Deno.bench("Median cut", async () => {
       .raw()
       .toBuffer({ resolveWithObject: true });
     const uint8 = new Uint8ClampedArray(data);
-    const imageData = new ImageData(uint8, info.width, info.height);
-    const quantizer = new MedianCut(imageData, { cache: false });
+    const quantizer = new MedianCut(uint8, info.width, info.height, {
+      cache: false,
+    });
     quantizer.apply(16);
     const indexedImage = quantizer.getIndexedImage();
     toSVG(indexedImage, info.width, info.height, quantizer.replaceColors);
@@ -28,8 +29,7 @@ Deno.bench("Octree quantization", async () => {
       .raw()
       .toBuffer({ resolveWithObject: true });
     const uint8 = new Uint8ClampedArray(data);
-    const imageData = new ImageData(uint8, info.width, info.height);
-    const quantizer = new OctreeQuantization(imageData);
+    const quantizer = new OctreeQuantization(uint8, info.width, info.height);
     quantizer.apply(16);
     const indexedImage = quantizer.getIndexedImage();
     toSVG(indexedImage, info.width, info.height, quantizer.replaceColors);
@@ -42,8 +42,7 @@ Deno.bench("Uniform quantization", async () => {
       .raw()
       .toBuffer({ resolveWithObject: true });
     const uint8 = new Uint8ClampedArray(data);
-    const imageData = new ImageData(uint8, info.width, info.height);
-    const quantizer = new UniformQuantization(imageData);
+    const quantizer = new UniformQuantization(uint8, info.width, info.height);
     quantizer.apply(16);
     const indexedImage = quantizer.getIndexedImage();
     const replaceColors = quantizer.getReplaceColors(16);

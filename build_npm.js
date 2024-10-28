@@ -15,10 +15,6 @@ await build({
   },
   shims: {
     deno: true,
-    custom: [{
-      module: "./src/imagedata.ts",
-      globalNames: ["ImageData"],
-    }],
   },
   package: {
     name: "@marmooo/imagetracer",

@@ -1,4 +1,5 @@
 import ImageTracer from "imagetracerjs";
+import sharp from "sharp";
 import { defaultOptions, PathData } from "./util.js";
 import { MedianCut } from "@marmooo/color-reducer";
 import { createBorderedInt16Array, detectEdges } from "./edge.js";
@@ -8,7 +9,6 @@ import { smoothPaths } from "./smooth.js";
 import { trace } from "./trace.js";
 import { toSVGString } from "./svg.js";
 import { TraceData } from "./mod.js";
-import { getPixels } from "get_pixels";
 import { expandGlob } from "@std/fs";
 
 function toSVG1(quantized, options) {
@@ -84,29 +84,29 @@ async function checkSize() {
     let size1 = 0;
     let size2 = 0;
     for await (const file of expandGlob("test/imagetracerjs/*.png")) {
-      const blob = await Deno.readFile(file.path);
-      const image = await getPixels(blob);
-      const imageData = new ImageData(
-        new Uint8ClampedArray(image.data),
-        image.width,
-        image.height,
-      );
-      const quantizer = new MedianCut(imageData, { cache: false });
+      const { data, info } = await sharp(file.path)
+        .ensureAlpha()
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+      const uint8 = new Uint8ClampedArray(data);
+      const quantizer = new MedianCut(uint8, info.width, info.height, {
+        cache: false,
+      });
       quantizer.apply(16);
       const indexedImage = quantizer.getIndexedImage();
       const array1 = createBorderedInt16Array(
         indexedImage,
-        image.width,
-        image.height,
+        info.width,
+        info.height,
       );
       const array2 = createBorderedArray(
         indexedImage,
-        image.width,
-        image.height,
+        info.width,
+        info.height,
       );
       const palette = createPalette(quantizer.replaceColors);
-      const width = image.width;
-      const height = image.height;
+      const width = info.width;
+      const height = info.height;
       const quantized1 = { array: array1, palette, width, height };
       const quantized2 = { array: array2, palette, width, height };
       const svg1 = toSVG1(quantized1, options);

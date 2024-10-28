@@ -14,8 +14,9 @@ Deno.bench("@marmooo/imagetracer", async () => {
       .raw()
       .toBuffer({ resolveWithObject: true });
     const uint8 = new Uint8ClampedArray(data);
-    const imageData = new ImageData(uint8, info.width, info.height);
-    const quantizer = new MedianCut(imageData, { cache: false });
+    const quantizer = new MedianCut(uint8, info.width, info.height, {
+      cache: false,
+    });
     quantizer.apply(16);
     const indexedImage = quantizer.getIndexedImage();
     const array = createBorderedInt16Array(
@@ -40,8 +41,9 @@ Deno.bench("imagetracerjs", async () => {
       .raw()
       .toBuffer({ resolveWithObject: true });
     const uint8 = new Uint8ClampedArray(data);
-    const imageData = new ImageData(uint8, info.width, info.height);
-    const quantizer = new MedianCut(imageData, { cache: false });
+    const quantizer = new MedianCut(uint8, info.width, info.height, {
+      cache: false,
+    });
     quantizer.apply(16);
     const indexedImage = quantizer.getIndexedImage();
     const array = createBorderedArray(
