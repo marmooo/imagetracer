@@ -40,3 +40,7 @@ deno test --allow-read
 deno bench --allow-read
 deno run --allow-read src/svg_size.js
 ```
+
+## License
+
+MIT
