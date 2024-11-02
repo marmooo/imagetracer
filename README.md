@@ -4,6 +4,10 @@
 
 Simple raster image tracer and vectorizer written in JavaScript.
 
+## GUI
+
+[image2svg](https://marmooo.github.io/image2svg/)
+
 ## Usage
 
 ```
